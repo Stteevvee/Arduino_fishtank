@@ -1,6 +1,10 @@
+/*
+* Author:   Steve Jame
+            Wouter Van Vlaenderen
+*/
 void setup() {
   // Setup RTC
-  
+
   // Setup pump
 
 }
