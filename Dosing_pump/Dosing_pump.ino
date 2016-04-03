@@ -2,17 +2,29 @@
 * Author:   Steve Jame
             Wouter Van Vlaenderen
             
-* Todo:     Timing pump (1s ~ 1ml)
+* Todo:     Timing pump (1s ~ 1ml) Ok
+            Add specific days
 */
+
+// Set dosingtime
+// Pump 1
+int pump1 = 8;
+int duration1 = 4; // Time in seconds
+int day1[] = {0}; // Specific day(s), 0 = daily
+String time1 = "16:58"; // Use this time format
+
+// Pump 2
+int pump2 = 9;
+int duration2 = 2; // Time in seconds
+int day2[] = {0}; // Specific day(s), 0 = daily
+String time2 = "16:58"; // Use this time format
 
 // Setup RTC
 #include "Wire.h"
 #define DS3231_I2C_ADDRESS 0x68
 byte second, minute, hour, dayOfWeek, dayOfMonth, month, year;
-
-// Pump pins
-int pump1 = 8, pump2 = 9;
-
+  
+int i = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -25,27 +37,27 @@ void setup() {
   // Pump output
   pinMode(pump1, OUTPUT);
   pinMode(pump2, OUTPUT);
+  digitalWrite(pump1, LOW);
+  digitalWrite(pump1, LOW);
 }
 
 void loop() {
   // Read RTC time
   readDS3231time(&second, &minute, &hour, &dayOfWeek, &dayOfMonth, &month, &year);
   
-  // Debug monitor + pump
+  // Debug monitor + pump + dosing pump 
+  Serial.println("Dosing time");
+  Serial.print(time1.substring(0,2).toInt());
+  Serial.print(':');
+  Serial.println(time1.substring(3,5).toInt());
+  Serial.println("Current time");
   Serial.print(hour);
   Serial.print(':');
-  Serial.print(minute);
-  Serial.print(':');
-  Serial.println(second);
+  Serial.println(minute);
   delay(1000);
-  
-  // Fill in time
-  if(hour = 0){
-    digitalWrite(pump1, HIGH);
-    digitalWrite(pump2, HIGH);
-  }
   // End debug
-  
+  dosePump(pump1, duration1, day1, time1);
+  dosePump(pump2, duration2, day2, time2);
 }
 
 void readDS3231time(byte *second, byte *minute, byte *hour, byte *dayOfWeek, byte *dayOfMonth, byte *month, byte *year) {
@@ -84,4 +96,18 @@ void setDS3231time(byte second, byte minute, byte hour, byte dayOfWeek, byte day
   Wire.write(decToBcd(month)); // set month
   Wire.write(decToBcd(year)); // set year (0 to 99)
   Wire.endTransmission();
+}
+
+void dosePump(int pumpID, int duration, int day[], String time){
+  if(time.substring(0,2).toInt() == hour && time.substring(3,5).toInt() == minute){
+    if(i <= duration){
+      digitalWrite(pumpID, HIGH);
+      i++;
+    }else{
+      digitalWrite(pumpID, LOW);
+    }
+  }else{
+    digitalWrite(pumpID, LOW);
+    i = 0;
+  }
 }
