@@ -10,13 +10,13 @@
 // Pump 1
 int pump1 = 8;
 int duration1 = 4; // Time in seconds
-int day1[] = {0}; // Specific day(s), 0 = daily
+int day1[] = {1,2}; // Specific day(s), 0 = daily
 String time1 = "16:58"; // Use this time format
 
 // Pump 2
 int pump2 = 9;
 int duration2 = 2; // Time in seconds
-int day2[] = {0}; // Specific day(s), 0 = daily
+int day2[] = {1,2,3,4,5,6,7}; // Specific day(s), 0 = daily
 String time2 = "16:58"; // Use this time format
 
 // Setup RTC
@@ -99,15 +99,21 @@ void setDS3231time(byte second, byte minute, byte hour, byte dayOfWeek, byte day
 }
 
 void dosePump(int pumpID, int duration, int day[], String time){
-  if(time.substring(0,2).toInt() == hour && time.substring(3,5).toInt() == minute){
-    if(i <= duration){
-      digitalWrite(pumpID, HIGH);
-      i++;
-    }else{
-      digitalWrite(pumpID, LOW);
-    }
-  }else{
-    digitalWrite(pumpID, LOW);
-    i = 0;
+  Serial.print("Pump id = ");
+  Serial.println(pumpID);
+  for(int j = 0; j <= (sizeof(day)-1); j++){
+    Serial.println(day[j]);
   }
+    if(time.substring(0,2).toInt() == hour && time.substring(3,5).toInt() == minute){
+      if(i <= duration){
+        digitalWrite(pumpID, HIGH);
+        i++;
+      }else{
+        digitalWrite(pumpID, LOW);
+      }
+    }else{
+      // Extra security LOW
+      digitalWrite(pumpID, LOW);
+      i = 0;
+    }
 }
